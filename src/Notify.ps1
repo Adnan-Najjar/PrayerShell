@@ -1,22 +1,28 @@
-param (
-[string]$PrayerName
-)
+# Takes prayer name as an argument for sending notification
+param ([string]$PrayerName)
 
-$scriptDir = "$env:USERPROFILE\Documents\PowerShell\Scripts\PrayerShell"
+# Define Script location
+$prayerShellPath = "$env:USERPROFILE\Documents\PowerShell\Scripts\PrayerShell"
 
-$prayerTimes = $(Import-Clixml -Path "$scriptDir\PrayerTimes\prayerTimes$(Get-Date -Format "_%d-%M").xml")
-if (-not ($prayerTimes)) {
-  Start-Process powershell.exe -ArgumentList "-WindowStyle Hidden -ExecutionPolicy Bypass -File `"$scriptDir\src\Get-PrayerTimes.ps1`""
+# Import prayer times if it exists
+# Otherwise, runs Get-PrayerTimes script to get them
+try {
+  $prayerTimes = $(Import-Clixml -Path "$PrayerShellPath\PrayerTimes\prayerTimes$(Get-Date -Format "_%d-%M").xml")
+} catch {
+  if ($_.Exception.Message -like "*Could not find file*") { 
+    Start-Process powershell.exe -ArgumentList "-WindowStyle Hidden -ExecutionPolicy Bypass -File `"$PrayerShellPath\src\Get-PrayerTimes.ps1`""
+  } else {
+    New-BurntToastNotification -Text "Something went Wrong!" -Applogo "$PrayerShellPath\assets\Athaan.png"
+    exit 1
+  }
 }
 
-if (-not (Get-Module -ListAvailable -Name BurntToast)) {
-  Install-PackageProvider -Name NuGet
-  Install-Module -Name BurntToast -Force -Scope CurrentUser
-}
-
-(New-Object Media.SoundPlayer "$scriptDir\Athaan.wav").Play();
-New-BurntToastNotification -Text "It is $PrayerName time" -Applogo "$scriptDir\assets\Athaan.png"
+# Play Athaan Sound and Send a notification
+(New-Object Media.SoundPlayer "$PrayerShellPath\assets\Athaan.wav").Play();
+New-BurntToastNotification -Text "It is $PrayerName time" -Applogo "$PrayerShellPath\assets\Athaan.png"
+# Wait for the sound to finish, then stop it
 Start-Sleep -Seconds 6.5
-(New-Object Media.SoundPlayer "$scriptDir\assets\Athaan.wav").Stop();
+(New-Object Media.SoundPlayer "$PrayerShellPath\assets\Athaan.wav").Stop();
 
-Unregister-ScheduledTask -TaskName "$($PrayerName)Notification" -Confirm:$false
+# Unregister the prayer notification
+Unregister-ScheduledTask -TaskName "$($PrayerName)PTNotification" -Confirm:$false
