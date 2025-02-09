@@ -1,4 +1,4 @@
-$scriptDir = "$HOME\Documents\PowerShell\Scripts\PrayerShell"
+$scriptDir = "$env:USERPROFILE\Documents\PowerShell\Scripts\PrayerShell"
 
 Get-ScheduledTask | Where-Object { $_.TaskName -like "*Notification" } | ForEach-Object { Unregister-ScheduledTask -TaskName $_.TaskName -Confirm:$false }
 

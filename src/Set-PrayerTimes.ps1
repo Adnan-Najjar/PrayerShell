@@ -1,9 +1,13 @@
-$scriptDir = "$HOME\Documents\PowerShell\Scripts\PrayerShell"
+$scriptDir = "$env:USERPROFILE\Documents\PowerShell\Scripts\PrayerShell"
 
 # whoami
 $user = [System.Security.Principal.WindowsIdentity]::GetCurrent().Name
 
 $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries
+
+if (-not (Test-Path -Path "$scriptDir\PrayerTimes")) {
+    New-Item -ItemType Directory -Path "$scriptDir\PrayerTimes" -Force
+}
 
 $prayerTimes = $(Import-Clixml -Path "$scriptDir\PrayerTimes\prayerTimes$(Get-Date -Format "_%d-%M").xml")
 if (-not ($prayerTimes)) {

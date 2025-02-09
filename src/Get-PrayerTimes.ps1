@@ -1,4 +1,4 @@
-$scriptDir = "$HOME\Documents\PowerShell\Scripts\PrayerShell"
+$scriptDir = "$env:USERPROFILE\Documents\PowerShell\Scripts\PrayerShell"
 
 $city =  (Invoke-RestMethod -Uri "https://ipinfo.io/json" -ErrorAction Stop).city
 

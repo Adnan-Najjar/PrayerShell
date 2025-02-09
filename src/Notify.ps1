@@ -2,7 +2,7 @@ param (
 [string]$PrayerName
 )
 
-$scriptDir = "$HOME\Documents\PowerShell\Scripts\PrayerShell"
+$scriptDir = "$env:USERPROFILE\Documents\PowerShell\Scripts\PrayerShell"
 
 $prayerTimes = $(Import-Clixml -Path "$scriptDir\PrayerTimes\prayerTimes$(Get-Date -Format "_%d-%M").xml")
 if (-not ($prayerTimes)) {
